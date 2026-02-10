@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+      - name: raw_data
+        description: "Raw data from NYC taxi rides"
+        database: pj-ny-taxi-data #Project ID from BigQuery
+        schema: zoomcamp #Dataset name
+        tables:
+              - name: green_tripdata
+              - name: yellow_tripdata
