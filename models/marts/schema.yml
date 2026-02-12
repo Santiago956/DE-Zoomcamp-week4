@@ -1,0 +1,98 @@
+version: 2
+
+models:
+  - name: dim_zones
+    description: Taxi zone dimension table with location details
+    columns:
+      - name: location_id
+        description: Unique identifier for each taxi zone
+        data_tests:
+          - unique
+          - not_null
+      - name: borough
+        description: NYC borough name
+      - name: zone
+        description: Specific zone name within the borough
+      - name: service_zone
+        description: Service zone classification
+
+  - name: dim_vendors
+    description: Taxi technology vendor dimension table
+    columns:
+      - name: vendor_id
+        description: Unique vendor identifier
+        data_tests:
+          - unique
+          - not_null
+      - name: vendor_name
+        description: Company name of the vendor
+
+  - name: dim_payment
+    description: "Lookup table containing payment method descriptions (Credit card, Cash, No charge, etc.)."
+    columns:
+      - name: payment_type
+        description: "Primary key. Unique identifier for the payment method."
+        tests:
+          - unique
+          - not_null
+      - name: description
+        description: "The description of the payment method (e.g., Credit Card, Cash, etc.)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  [
+                    "Credit card",
+                    "Cash",
+                    "No charge",
+                    "Dispute",
+                    "Unknown",
+                    "Voided trip",
+                  ]
+
+  - name: fact_trips
+    description: "Fact table containing all the metrics from trips and keys to dimension tables"
+    columns:
+      - name: trip_id
+        description: "Primary key for the trip, generated via UUID."
+        tests:
+          - unique
+          - not_null
+
+      - name: vendor_id
+        description: "Reference to the vendor dimension."
+        # Se você tiver uma dim_vendor, pode adicionar o relacionamento aqui
+
+      - name: payment_type
+        description: "Foreign key for payment types."
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_payment')
+                field: payment_type
+
+      - name: pickup_location_id
+        description: "Foreign key for the pickup location (Zone)."
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_zones')
+                field: location_id
+
+      - name: dropoff_location_id
+        description: "Foreign key for the dropoff location (Zone)."
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_zones')
+                field: location_id
+
+      - name: pickup_datetime
+        description: "The date and time when the meter was engaged."
+
+      - name: trip_distance
+        description: "The elapsed trip distance in miles."
+
+      - name: total_amount
+        description: "Total amount charged to passengers."
