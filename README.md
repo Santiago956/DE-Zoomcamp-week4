@@ -59,7 +59,6 @@ WHERE EXTRACT(YEAR FROM pickup_datetime) = 2019
 GROUP BY service_type;
 ```
 
-**Answer**: 384,624 trips
 
 ## 🚀 Getting Started
 
